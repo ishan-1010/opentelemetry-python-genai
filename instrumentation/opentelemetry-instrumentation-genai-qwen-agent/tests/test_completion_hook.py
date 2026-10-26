@@ -78,10 +78,10 @@ def test_completion_hook_defaults_to_load_completion_hook(
         )
 
 
-def test_completion_hook_invoked(
+def test_completion_hook_not_invoked_for_local_agent(
     tracer_provider, logger_provider, meter_provider
 ):
-    """The hook's on_completion is called after an agent run completes."""
+    """The completion hook is not called for local agent invocations."""
     hook = MagicMock()
 
     def fake_run(messages, **kwargs):
@@ -99,5 +99,4 @@ def test_completion_hook_invoked(
     ):
         list(_StubAgent.create().run([Message(role="user", content="Hello")]))
 
-    hook.on_completion.assert_called_once()
-    assert hook.on_completion.call_args.kwargs["span"] is not None
+    hook.on_completion.assert_not_called()
