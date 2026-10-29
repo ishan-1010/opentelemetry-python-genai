@@ -306,7 +306,8 @@ class _ModelStreamWrapper(SyncStreamWrapper["ChatMessageStreamDelta"]):
 
     def __del__(self) -> None:
         try:
-            self._finalize_success()
+            with self._execution_context():
+                self._finalize_success()
         except BaseException:  # pylint: disable=broad-except
             pass
 
@@ -437,7 +438,8 @@ class _AgentRunStreamWrapper(SyncStreamWrapper[_RunStreamChunk]):
 
     def __del__(self) -> None:
         try:
-            self._finalize_success()
+            with self._execution_context():
+                self._finalize_success()
         except BaseException:  # pylint: disable=broad-except
             pass
 
