@@ -439,7 +439,10 @@ class _AgentRunStreamWrapper(SyncStreamWrapper[_RunStreamChunk]):
     def __del__(self) -> None:
         try:
             with self._execution_context():
-                self._finalize_success()
+                try:
+                    self._self_stream.close()
+                finally:
+                    self._finalize_success()
         except BaseException:  # pylint: disable=broad-except
             pass
 

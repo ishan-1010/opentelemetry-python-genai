@@ -7,6 +7,7 @@ import gc
 import inspect
 import json
 import pathlib
+import sys
 import tempfile
 import weakref
 from collections.abc import Generator
@@ -307,6 +308,18 @@ def test_abandoned_streaming_run_does_not_leak_context(
         if span.name == "unrelated"
     ]
     assert unrelated.parent is None
+
+
+def test_abandoned_streaming_run_closes_the_run(
+    instrument_with_content, span_exporter, monkeypatch
+) -> None:
+    unraisable: list[Any] = []
+    monkeypatch.setattr(sys, "unraisablehook", unraisable.append)
+    agent = CodeAgent(tools=[], model=FakeCodeModel(), max_steps=3)
+    _first_step_only(agent)
+    gc.collect()
+
+    assert unraisable == []
 
 
 def test_code_agent_streaming_is_lazy_until_drained(
